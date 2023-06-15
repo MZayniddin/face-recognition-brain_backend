@@ -1,8 +1,14 @@
 const express = require("express");
 const cors = require("cors");
-const bodyParser = require("body-parser");
-const app = express();
+const bcrypt = require("bcrypt");
 const PORT = process.env.PORT || 3000;
+const app = express();
+
+const register = require("./controllers/register");
+const signin = require("./controllers/signin");
+const profile = require("./controllers/profile");
+const image = require("./controllers/image");
+
 const db = require("knex")({
   client: "pg",
   connection: {
@@ -13,53 +19,26 @@ const db = require("knex")({
   },
 });
 
-app.use(bodyParser.json());
 app.use(cors());
+app.use(express.json());
 
-app.post("/register", (req, res) => {
-  const { email, name, password } = req.body;
-
-  if (!email || !name) return res.json({ message: "Each space required" });
-
-  db("users")
-    .returning("*")
-    .insert({
-      email,
-      name,
-      joined: new Date(),
-    })
-    .then((response) => res.json(response[0]))
-    .catch((error) => res.status(400).json({ message: "Enable to join" }));
-});
-
-app.get("/profile/:id", (req, res) => {
-  const { id } = req.params;
-  db.select("*")
-    .from("users")
-    .where({ id })
-    .then((response) => {
-      if (response.length) {
-        res.json(response[0]);
-      } else {
-        res.status(400).json({ message: "User not found" });
-      }
-    })
-    .catch((error) => res.status(400).json({ message: "Error getting user" }));
-});
-
-app.put("/image", (req, res) => {
-  const { id } = req.body;
-  if (!id) return res.status(400).json({ message: "ID is required" });
-
-  db("users")
-    .where("id", "=", id)
-    .increment("entries", 1)
-    .returning("entries")
-    .then((entries) => console.log(entries));
-});
-
+// ROUTES
 app.get("/", (req, res) => res.send("SERVER IS WORKING"));
+app.post("/signin", signin.handleSignin(db, bcrypt));
+app.post("/register", (req, res) => {
+  register.handleRegister(req, res, db);
+});
+app.get("/profile/:id", (req, res) => {
+  profile.handleProfileGet(req, res, db);
+});
+app.put("/image", (req, res) => {
+  profile.handleProfileGet(req, res, db);
+});
+app.post("/imageurl", (req, res) => {
+  image.handleApiCall(req, res);
+});
 
+// LISTENING PORT
 app.listen(PORT, () => {
   console.log("Sever is running on port " + PORT);
 });
