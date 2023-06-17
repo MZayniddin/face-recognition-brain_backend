@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const bcrypt = require("bcrypt");
@@ -13,9 +14,9 @@ const db = require("knex")({
   client: "pg",
   connection: {
     host: "127.0.0.1",
-    user: "mz",
-    password: "4321",
-    database: "smartbrain",
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
   },
 });
 

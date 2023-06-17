@@ -1,7 +1,7 @@
-const PAT = "645b039b4882440f916800b3f6e48397";
-const USER_ID = "mzclarifai";
-const APP_ID = "my-first-application";
-const MODEL_ID = "face-detection";
+const PAT = process.env.PAT;
+const USER_ID = process.env.C_USER_ID;
+const APP_ID = process.env.C_APP_ID;
+const MODEL_ID = process.env.C_MODEL_ID;
 
 const { ClarifaiStub, grpc } = require("clarifai-nodejs-grpc");
 
