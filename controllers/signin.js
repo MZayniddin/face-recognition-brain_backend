@@ -7,6 +7,7 @@ const handleSignin = (db, bcrypt) => (req, res) => {
     .from("login")
     .where("email", "=", email)
     .then((data) => {
+      if (!data[0]) return res.status(400).json("user not found");
       const isValid = bcrypt.compareSync(password, data[0].hash);
       if (isValid) {
         return db
