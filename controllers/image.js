@@ -1,5 +1,3 @@
-const Clarifai = require("clarifai");
-
 const PAT = "645b039b4882440f916800b3f6e48397";
 const USER_ID = "mzclarifai";
 const APP_ID = "my-first-application";
@@ -35,7 +33,6 @@ const handleApiCall = (req, res) => {
           "Post model outputs failed, status: " + response.status.description
         );
       }
-
       res.json(response);
     }
   );
@@ -43,7 +40,7 @@ const handleApiCall = (req, res) => {
 
 const handleImage = (req, res, db) => {
   const { id } = req.body;
-  console.log(req.body);
+  if (!id) return res.status(400).json("ID required in body");
   db("users")
     .where("id", "=", id)
     .increment("entries", 1)
@@ -51,7 +48,9 @@ const handleImage = (req, res, db) => {
     .then((entries) => {
       res.json(entries[0].entries);
     })
-    .catch((err) => res.status(400).json("unable to get entries"));
+    .catch((err) => {
+      res.status(400).json("unable to get entries");
+    });
 };
 
 module.exports = {
